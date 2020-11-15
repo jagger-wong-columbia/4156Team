@@ -1,0 +1,369 @@
+package controllers;
+
+import com.google.gson.Gson;
+import io.javalin.Javalin;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Queue;
+import models.GameBoard;
+import models.Message;
+import models.Player;
+import org.eclipse.jetty.websocket.api.Session;
+//import utils.Databasejdbc;
+
+
+
+public class PlayGame {
+
+  private static final int PORT_NUMBER = 8080;
+
+  private static Javalin app;
+  
+  private static GameBoard board = new GameBoard();
+  
+  // private static Databasejdbc jdbc = new Databasejdbc();
+  
+  private static Connection c = null;
+
+  /** Main method of the application.
+   * @param args Command line arguments
+   */
+  public static void main(final String[] args) {
+
+    app = Javalin.create(config -> {
+      config.addStaticFiles("/public");
+    }).start(PORT_NUMBER);
+    
+    // Connect to database whose name is jw3830DB.db
+    try {
+      Class.forName("org.sqlite.JDBC");
+      c = DriverManager.getConnection("jdbc:sqlite:jw3830DB.db");
+    } catch (Exception e) {
+      System.err.println(e.getClass().getName() + ": " + e.getMessage());
+      System.exit(0);
+    }
+    System.out.println("Opened database successfully");
+    
+    Statement stmt1 = null;
+    ResultSet rs1 = null;
+    try {
+      c.setAutoCommit(false);
+      stmt1 = c.createStatement();
+      rs1 = stmt1.executeQuery("SELECT * FROM BOARD;");
+      while (rs1.next()) {
+        char p1 = rs1.getString("p1").charAt(0);
+        char p2 = rs1.getString("p2") == null ? '0' : rs1.getString("p2").charAt(0);
+        boolean gameStarted = rs1.getBoolean("gameStarted");
+        int turn = rs1.getInt("turn");
+        String boardState = rs1.getString("boardState");
+        int winner = rs1.getInt("winner");
+        String rows = rs1.getString("rows");
+        String cols = rs1.getString("cols");
+        int diagonal = rs1.getInt("diagonal");
+        int antidiagonal = rs1.getInt("antidiagonal");
+        int count = rs1.getInt("count");
+        board.setBoard(p1, p2, gameStarted, turn, boardState, winner, rows, 
+            cols, diagonal, antidiagonal, count);
+      }
+      rs1.close();
+      stmt1.close();
+      c.close();
+    } catch (Exception e) {
+      try {
+        rs1.close();
+        stmt1.close();
+        c.close();
+      } catch (Exception e1) {
+        System.err.println(e1.getClass().getName() + ": " + e1.getMessage());
+      }
+      System.err.println(e.getClass().getName() + ": " + e.getMessage());
+    }
+
+
+    // New game;
+    app.get("/newgame", ctx -> {
+      board.initialize();
+      
+      // create tables
+      Statement stmt = null;
+      try {
+        Class.forName("org.sqlite.JDBC");
+        c = DriverManager.getConnection("jdbc:sqlite:jw3830DB.db");
+        stmt = c.createStatement();
+        // delete tables ahead
+        String d1 = "DROP TABLE BOARD";
+        stmt.executeUpdate(d1);
+        
+        //ResultSet rs2 = stmt.executeQuery("SELECT * FROM BOARD;");
+        //rs2.close();
+      } catch (Exception e) {
+        System.err.println(e.getClass().getName() + ": " + e.getMessage());
+      }
+      try {
+        String sql1 = "CREATE TABLE BOARD " 
+                  + "(ID INT PRIMARY KEY NOT NULL,"
+                  + " p1 TEXT,"
+                  + " p2 TEXT,"
+                  + " gameStarted  BOOLEAN   NOT NULL,"
+                  + " turn         INT       NOT NULL,"
+                  + " boardState   TEXT      ,"
+                  + " winner       INT       NOT NULL,"
+                  + " isDraw       BOOLEAN   NOT NULL,"
+                  + " rows         TEXT      NOT NULL,"
+                  + " cols         TEXT      NOT NULL,"
+                  + " diagonal     INT       NOT NULL,"
+                  + " antidiagonal INT       NOT NULL,"
+                  + " count        INT       NOT NULL)";
+        stmt.executeUpdate(sql1);
+        stmt.close();
+        c.close();
+      } catch (Exception e) {
+        System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        System.exit(0);
+      }
+      System.out.println("Table created successfully");
+      
+      ctx.redirect("/tictactoe.html");
+    });
+    
+    // Start game;
+    app.post("/startgame", ctx -> {
+      Gson gson = new Gson();
+      char type = ctx.body().split("=")[1].charAt(0);
+      board.startGame(type);
+      String json = gson.toJson(board);
+      ctx.result(json);
+      
+      // update table board
+      Statement stmt = null;
+      try {
+        Class.forName("org.sqlite.JDBC");
+        c = DriverManager.getConnection("jdbc:sqlite:jw3830DB.db");
+        c.setAutoCommit(false);
+        System.out.println("Opened database successfully");
+
+        stmt = c.createStatement();
+        String sql = "INSERT INTO BOARD (ID,p1,gameStarted,turn,boardState,winner,isDraw,"
+             + "rows,cols,diagonal,antidiagonal,count) "
+             + "VALUES (1, '" 
+             + String.valueOf(board.getP1().getType()) + "', "
+             + board.getStartStatus() + ", " + board.getTurn() + ", '"
+             + board.getboardState() + "', " + board.getWinner() + ", "
+             + board.getisDraw() + ", '" + board.getRows() + "', '" + board.getCols() + "', "
+             + board.getDiagonal() + ", " + board.getAntidiagonal()
+             + ", " + board.getCount() + ");";
+        System.out.println(sql);
+        stmt.executeUpdate(sql);
+        
+        //// Select operation: query board state
+        //ResultSet rs = stmt.executeQuery("SELECT * FROM BOARD;");
+        //rs = stmt.executeQuery("SELECT * FROM BOARD;");
+        //while (rs.next()) {
+        //  int id = rs.getInt("id");
+        //  char p1 = rs.getString("p1").charAt(0);
+        //  //char p2 = rs.getString("p2").charAt(0);
+        //  boolean gameStarted = rs.getBoolean("gameStarted");
+        //  String boardState = rs.getString("boardState");
+        //  int winner = rs.getInt("winner");
+        //  String rows = rs.getString("rows");
+        //  String cols = rs.getString("cols");
+        //  int disgonal = rs.getInt("diagonal");
+        //  int antidiagonal = rs.getInt("antidiagonal");
+        //  int count = rs.getInt("count");
+        //  
+        //  System.out.println(p1);
+        //  //System.out.println(p2);
+        //  System.out.println(gameStarted);
+        //  System.out.println(boardState);
+        //  System.out.println(winner);
+        //  System.out.println(rows);
+        //  System.out.println(cols);
+        //  System.out.println(disgonal);
+        //  System.out.println(antidiagonal);
+        //  System.out.println(count);
+        //}
+        //rs.close();
+
+        stmt.close();
+        c.commit();
+        c.close();
+      } catch (Exception e) {
+        System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        System.exit(0);
+      }
+      System.out.println("Records created successfully");
+    });
+
+    // Join Game;
+    app.get("/joingame", ctx -> {
+      ctx.redirect("/tictactoe.html?p=2");
+      board.joinPlayer();
+      Gson gson = new Gson();
+      String json = gson.toJson(board);
+      
+      // update board
+      Statement stmt = null;
+      try {
+        Class.forName("org.sqlite.JDBC");
+        c = DriverManager.getConnection("jdbc:sqlite:jw3830DB.db");
+        c.setAutoCommit(false);
+        System.out.println("Opened database successfully");
+
+        stmt = c.createStatement();
+        String sql = "UPDATE BOARD set p2 = '" + String.valueOf(board.getP2().getType())
+            + "', gameStarted = true where ID=1;"; 
+        stmt.executeUpdate(sql);
+        System.out.println(sql);
+
+        stmt.close();
+        c.commit();
+        c.close();
+      } catch (Exception e) {
+        System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        System.exit(0);
+      }
+      System.out.println("Update done successfully");
+      
+      sendGameBoardToAllPlayers(json);
+    });
+    
+    // Move;
+    app.post("/move/1", ctx -> {
+      if (board.getTurn() == 1) {
+        String[] info = ctx.body().split("&");
+        int x = Integer.valueOf(info[0].split("=")[1]);
+        int y = Integer.valueOf(info[1].split("=")[1]);
+        Gson gson = new Gson();
+        Message m = new Message();
+        
+        if (board.makeMove(x, y, 1)) {
+          m.setValid();
+          ctx.result(gson.toJson(m));
+          board.setTurn(2);
+        } else {
+          m.setInvalid();
+          ctx.result(gson.toJson(m));
+        }
+        
+        if (board.checkWin(1, x, y)) {
+          Message win = new Message();
+          win.setWin(1);
+          ctx.result(gson.toJson(win));
+        }
+        
+        // update board
+        Statement stmt = null;
+        try {
+          Class.forName("org.sqlite.JDBC");
+          c = DriverManager.getConnection("jdbc:sqlite:jw3830DB.db");
+          c.setAutoCommit(false);
+          stmt = c.createStatement();
+          String sql = "UPDATE BOARD set turn=2, boardState='" + board.getboardState()
+               + "',winner='" + board.getWinner() + "',isDraw='" + board.getisDraw()
+               + "',rows='" + board.getRows() + "',cols='" + board.getCols()
+               + "',count=" + board.getCount() + ",diagonal=" + board.getDiagonal()
+               + ",antidiagonal=" + board.getAntidiagonal() + " where ID=1;"; 
+          System.out.println(sql);
+          stmt.executeUpdate(sql);
+          stmt.close();
+          c.commit();
+          c.close();
+        } catch (Exception e) {
+          System.err.println(e.getClass().getName() + ": " + e.getMessage());
+          System.exit(0);
+        }
+        System.out.println("Update done successfully");
+        
+        String json = gson.toJson(board);
+        sendGameBoardToAllPlayers(json);
+      } else {
+        Gson gson = new Gson();
+        Message m = new Message();
+        m.setInvalid();
+        ctx.result(gson.toJson(m));
+      }
+    });
+    
+    app.post("/move/2", ctx -> {
+      if (board.getTurn() == 2) {
+        String[] info = ctx.body().split("&");
+        int x = Integer.valueOf(info[0].split("=")[1]);
+        int y = Integer.valueOf(info[1].split("=")[1]);
+        Gson gson = new Gson();
+        Message m = new Message();
+        
+        if (board.makeMove(x, y, 2)) {
+          m.setValid();
+          ctx.result(gson.toJson(m));
+          board.setTurn(1);
+        } else {
+          m.setInvalid();
+          ctx.result(gson.toJson(m));
+        }
+        
+        if (board.checkWin(2, x, y)) {
+          Message win = new Message();
+          win.setWin(2);
+          ctx.result(gson.toJson(win));
+        }
+
+        // update board
+        Statement stmt = null;
+        try {
+          Class.forName("org.sqlite.JDBC");
+          c = DriverManager.getConnection("jdbc:sqlite:jw3830DB.db");
+          c.setAutoCommit(false);
+          stmt = c.createStatement();
+          String sql = "UPDATE BOARD set turn=1, boardState='" + board.getboardState()
+               + "',winner='" + board.getWinner() + "',isDraw='" + board.getisDraw()
+               + "',rows='" + board.getRows() + "',cols='" + board.getCols()
+               + "',count=" + board.getCount() + ",diagonal=" + board.getDiagonal()
+               + ",antidiagonal=" + board.getAntidiagonal() + " where ID=1;"; 
+          System.out.println(sql);
+          stmt.executeUpdate(sql);
+          stmt.close();
+          c.commit();
+          c.close();
+        } catch (Exception e) {
+          System.err.println(e.getClass().getName() + ": " + e.getMessage());
+          System.exit(0);
+        }
+        System.out.println("Update done successfully");
+        
+        String json = gson.toJson(board);
+        sendGameBoardToAllPlayers(json);
+      } else {
+        Gson gson = new Gson();
+        Message m = new Message();
+        m.setInvalid();
+        ctx.result(gson.toJson(m));
+      }
+    });
+    
+
+    // Web sockets - DO NOT DELETE or CHANGE
+    app.ws("/gameboard", new UiWebSocket());
+  }
+
+  /** Send message to all players.
+   * @param gameBoardJson Gameboard JSON
+   * @throws IOException Websocket message send IO Exception
+   */
+  private static void sendGameBoardToAllPlayers(final String gameBoardJson) {
+    Queue<Session> sessions = UiWebSocket.getSessions();
+    for (Session sessionPlayer : sessions) {
+      try {
+        sessionPlayer.getRemote().sendString(gameBoardJson);
+      } catch (IOException e) {
+        // Add logger here
+      }
+    }
+  }
+
+  public static void stop() {
+    app.stop();
+  }
+}
