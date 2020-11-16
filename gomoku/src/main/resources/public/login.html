@@ -1,46 +1,54 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <meta name="google-signin-scope" content="profile email">
-  <meta name="google-signin-client_id" content="392046225520-gkn0dq4ie4db3cmq00fb6j0flp0gkdaa.apps.googleusercontent.com">
-  <script src="https://apis.google.com/js/api:client.js" async defer></script>
-  <title>Rock21 - Gomoku</title>
-  <link rel="stylesheet" href="./loginstyle.css">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="392046225520-gkn0dq4ie4db3cmq00fb6j0flp0gkdaa.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+	<title>Rock21 - Gomoku</title>
+	<link rel="stylesheet" href="./loginstyle.css">
+  </head>
+  <body>
+	<form>
+	  <h1>COMS4156 Rock21 Gomoku</h1>
+	  <input placeholder="Enter your email" type="text"/>
+	  <input placeholder="Password" type="password"/>
+	  <input placeholder="Password, again" type="password"/>
+	  <button>Register with Rock21</button>
+	  <h3>Or</h3>
+    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+    <button href="#" onclick="signOut();">Sign out</button>
+    <script>
+      function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+          console.log('User signed out.');
+        });
+      }
+    </script>
+    <script>
+      function onSignIn(googleUser) {
+        // Useful data for your client-side scripts:
+        var profile = googleUser.getBasicProfile();
+        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+        console.log('Full Name: ' + profile.getName());
+        console.log('Given Name: ' + profile.getGivenName());
+        console.log('Family Name: ' + profile.getFamilyName());
+        console.log("Image URL: " + profile.getImageUrl());
+        console.log("Email: " + profile.getEmail());
+        // The ID token you need to pass to your backend:
+        var id_token = googleUser.getAuthResponse().id_token;
+        console.log("ID Token: " + id_token);
 
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<form>
-  <h1>COMS4156 Rock21 Gomoku</h1>
-  <input placeholder="Enter your email" type="text"/>
-  <input placeholder="Password" type="password"/>
-  <input placeholder="Password, again" type="password"/>
-  <button>Register with Rock21</button>
-  <h3>Or</h3>
-  <!-- <button class="twit">Login in with Twitter</button>
-  <button class="google">Login in with Google</button> -->
+        window.location.href='mode.html';
 
-  <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-  <script>
-    function onSignIn(googleUser) {
-      // Useful data for your client-side scripts:
-      var profile = googleUser.getBasicProfile();
-      console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-      console.log('Full Name: ' + profile.getName());
-      console.log('Given Name: ' + profile.getGivenName());
-      console.log('Family Name: ' + profile.getFamilyName());
-      console.log("Image URL: " + profile.getImageUrl());
-      console.log("Email: " + profile.getEmail());
-
-      // The ID token you need to pass to your backend:
-      var id_token = googleUser.getAuthResponse().id_token;
-      console.log("ID Token: " + id_token);
-    }
-  </script>
-
-</form>
-<!-- partial -->
-  <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script> -->
-</body>
+        // var xmlhttp = new XMLHttpRequest();
+        // xmlhttp.open('GET', 'http://localhost:8080/login.html');
+        // xmlhttp.onload = function() {
+        //   window.location.href='mode.html';
+        // };
+      }
+    </script>
+    </form>
+  </body>
 </html>

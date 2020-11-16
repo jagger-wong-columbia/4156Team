@@ -37,8 +37,12 @@ public class PlayGame {
       config.addStaticFiles("/public");
     }).start(PORT_NUMBER);
 
+    // New game;
+    app.get("/test1", ctx -> {
+      ctx.redirect("/gomoku.html");
+    });
     
-    // login;
+    // New game;
     app.get("/login", ctx -> {
       ctx.redirect("/login.html");
     });

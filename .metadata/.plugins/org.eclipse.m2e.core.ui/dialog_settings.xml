@@ -2,6 +2,7 @@
 <section name="Workbench">
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="G:\4156_test\rock21\gomoku"/>
 		</list>
 		<list key="projectNameTemplate">
 			<item value="[artifactId]"/>
