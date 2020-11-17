@@ -132,8 +132,8 @@ class PlayGame {
       }
       // read the X and Y positions of move from request positions
       String[] info = ctx.body().split("&");
-      int x = Integer.valueOf(info[0].split("=")[1]);
-      int y = Integer.valueOf(info[1].split("=")[1]);
+      int x = Integer.parseInt(info[0].split("=")[1]);
+      int y = Integer.parseInt(info[1].split("=")[1]);
       currentMove.setMoveX(x);
       currentMove.setMoveY(y);
       
@@ -323,7 +323,7 @@ class PlayGame {
       }
     }
     // determine if it is draw if the game board is filled and no one wins
-    if (game.getTurn() == 196) {
+    if (game.getTurn() == 225) {
       game.setDraw(true);
     }
   }
@@ -348,8 +348,12 @@ class PlayGame {
       stmt.close();
       c.close();
     } catch (Exception e) {
-      stmt.close();
-      c.close();
+      if (stmt != null) {
+        stmt.close();
+      }
+      if (c != null) {
+        c.close();
+      }
       System.err.println(e.getClass().getName() + ": " + e.getMessage());
       System.exit(0);
     }
@@ -377,8 +381,12 @@ class PlayGame {
       stmt.close();
       c.close();
     } catch (Exception e) {
-      stmt.close();
-      c.close();
+      if (stmt != null) {
+        stmt.close();
+      }
+      if (c != null) {
+        c.close();
+      }
       System.err.println(e.getClass().getName() + ": " + e.getMessage());
       System.exit(0);
     }
