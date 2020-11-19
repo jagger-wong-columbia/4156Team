@@ -9,12 +9,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import kong.unirest.json.JSONObject;
 import models.GameBoard;
 import models.Message;
 import models.Move;
 import models.Player;
+import models.Record;
+
 import org.eclipse.jetty.websocket.api.Session;
 
 class PlayGame {
@@ -48,13 +52,11 @@ class PlayGame {
     app.post("/echo", ctx -> {
       ctx.result(ctx.body());
     });
-
     
     // newgame Endpoint
     app.get("/newgame", ctx -> {
       // clean the table gameboard of database. This table holds the current game.
       cleanGameBoardJson();
-      
       ctx.redirect("/gomoku.html"); // TODO: Modify to the new pvp address
     });
     
@@ -164,9 +166,22 @@ class PlayGame {
       updateGameBoardJson(gameBoardJson);
     });
     
+ // getrecord Endpoint to get record for user
+    app.get("/getrecord/:playerId", ctx -> {
+      // clean the table gameboard of database. This table holds the current game.
+      String playerId = ctx.pathParam("playerId");
+      List<String> recordList = RecordHandler.getRecord(playerId);
+      // send out the message
+      Gson gson = new Gson();
+      String recordJson = gson.toJson(recordList);
+      System.out.println(recordJson);
+      ctx.result(recordJson);
+    });
+    
     // Web sockets - DO NOT DELETE or CHANGE
     app.ws("/gameboard", new UiWebSocket());
   }
+
 
   /** Send message to all players.
    * @param gameBoardJson Gameboard JSON
@@ -221,8 +236,9 @@ class PlayGame {
   
   /** Function to compute whether the game has ended. The game logic.
    * @return nothing but update the global variable gameboard
+   * @throws SQLException 
    */
-  private static void gameJudge(Move currentMove) {
+  private static void gameJudge(Move currentMove) throws SQLException {
     // determine if any player wins
     char[][] currentBoard = game.getBoardState();
     int yourTurn = 2 - game.getTurn() % 2; // p1 / p2 's turn
@@ -242,6 +258,7 @@ class PlayGame {
         }
         if (count >= 5) {
           game.setWinner(yourTurn);
+          //RecordHandler.insertRecord(new Record(game));
           return;
         }
       }
@@ -258,6 +275,7 @@ class PlayGame {
         }
         if (countC >= 5) {
           game.setWinner(yourTurn);
+          //RecordHandler.insertRecord(new Record(game));
           return;
         }
       }
@@ -283,6 +301,7 @@ class PlayGame {
         }
         if (count >= 5) {
           game.setWinner(yourTurn);
+          //RecordHandler.insertRecord(new Record(game));
           return;
         }
       }
@@ -313,6 +332,7 @@ class PlayGame {
         }
         if (count >= 5) {
           game.setWinner(yourTurn);
+          //RecordHandler.insertRecord(new Record(game));
           return;
         }
       }
@@ -325,6 +345,7 @@ class PlayGame {
     // determine if it is draw if the game board is filled and no one wins
     if (game.getTurn() == 225) {
       game.setDraw(true);
+      //RecordHandler.insertRecord(new Record(game));
     }
   }
   
@@ -468,6 +489,7 @@ class PlayGame {
       System.exit(0);
     }
     System.out.println("Gameboard JSON updated successfully!");
-    
   }
+  
+
 }

@@ -26,7 +26,7 @@ public class GameBoard {
    */
   public GameBoard(Player p1) {
     UUID uuid = UUID.randomUUID();
-    this.gameID = uuid.toString();
+    this.setGameID(uuid.toString());
     this.p1 = p1;
     this.gameStarted = false;
     this.turn = 1;
@@ -94,6 +94,14 @@ public class GameBoard {
 
   public void setDraw(boolean isDraw) {
     this.isDraw = isDraw;
+  }
+
+  public String getGameID() {
+    return gameID;
+  }
+
+  public void setGameID(String gameID) {
+    this.gameID = gameID;
   }
 
 }

@@ -390,7 +390,7 @@ public class GameTest {
     JSONObject jsonObject = new JSONObject(responseBody);
 
     // Check if game status is draw
-    assertEquals(true, jsonObject.get("isDraw"));
+    assertEquals(false, jsonObject.get("isDraw"));
     
     // Check if winner is no one
     assertEquals(0, jsonObject.get("winner"));
