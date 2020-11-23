@@ -5,137 +5,165 @@ import io.javalin.Javalin;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Queue;
+import kong.unirest.json.JSONObject;
 import models.GameBoard;
 import models.Message;
+import models.Move;
 import models.Player;
 import org.eclipse.jetty.websocket.api.Session;
-//import utils.Databasejdbc;
 
-
-
-public class PlayGame {
+class PlayGame {
 
   private static final int PORT_NUMBER = 8080;
 
   private static Javalin app;
   
-  private static GameBoard board = new GameBoard();
-  
-  // private static Databasejdbc jdbc = new Databasejdbc();
-  
-  private static Connection c = null;
+  private static GameBoard game; // global variable game for all endpoints to access.
 
   /** Main method of the application.
    * @param args Command line arguments
    */
   public static void main(final String[] args) {
-
+    // Database already initialized with table, leave 500 bytes for gameboard json
+    // String sql = "CREATE TABLE GAMEBOARD "
+    //    + "(ID INT PRIMARY KEY     NOT NULL,"
+    //    + " GAMEBOARDJSON  CHAR(500))";
+    
+    // Javalin initialization
     app = Javalin.create(config -> {
       config.addStaticFiles("/public");
     }).start(PORT_NUMBER);
 
-    
-    // login;
-    app.get("/login", ctx -> {
-      ctx.redirect("/login.html");
+    // Test Server Status
+    app.get("/", ctx -> {
+      ctx.result("Server is ready!");
     });
     
-    // New game;
+    // Test Echo Server
+    app.post("/echo", ctx -> {
+      ctx.result(ctx.body());
+    });
+
+    
+    // newgame Endpoint
     app.get("/newgame", ctx -> {
-      board.initialize();
-      ctx.redirect("/tictactoe.html");
-    });
-    
-    // Start game;
-    app.post("/startgame", ctx -> {
-      Gson gson = new Gson();
-      char type = ctx.body().split("=")[1].charAt(0);
-      board.startGame(type);
-      String json = gson.toJson(board);
-      ctx.result(json);
-    });
-
-    // Join Game;
-    app.get("/joingame", ctx -> {
-      ctx.redirect("/tictactoe.html?p=2");
-      board.joinPlayer();
-      Gson gson = new Gson();
-      String json = gson.toJson(board);
+      // clean the table gameboard of database. This table holds the current game.
+      cleanGameBoardJson();
       
-      sendGameBoardToAllPlayers(json);
+      ctx.redirect("/gomoku.html"); // TODO: Modify to the new pvp address
     });
     
-    // Move;
-    app.post("/move/1", ctx -> {
-      if (board.getTurn() == 1) {
-        String[] info = ctx.body().split("&");
-        int x = Integer.valueOf(info[0].split("=")[1]);
-        int y = Integer.valueOf(info[1].split("=")[1]);
-        Gson gson = new Gson();
-        Message m = new Message();
-        
-        if (board.makeMove(x, y, 1)) {
-          m.setValid();
-          ctx.result(gson.toJson(m));
-          board.setTurn(2);
-        } else {
-          m.setInvalid();
-          ctx.result(gson.toJson(m));
-        }
-        
-        if (board.checkWin(1, x, y)) {
-          Message win = new Message();
-          win.setWin(1);
-          ctx.result(gson.toJson(win));
-        }
-        
-        String json = gson.toJson(board);
-        sendGameBoardToAllPlayers(json);
-      } else {
-        Gson gson = new Gson();
-        Message m = new Message();
-        m.setInvalid();
-        ctx.result(gson.toJson(m));
-      }
-    });
     
-    app.post("/move/2", ctx -> {
-      if (board.getTurn() == 2) {
-        String[] info = ctx.body().split("&");
-        int x = Integer.valueOf(info[0].split("=")[1]);
-        int y = Integer.valueOf(info[1].split("=")[1]);
-        Gson gson = new Gson();
-        Message m = new Message();
-        
-        if (board.makeMove(x, y, 2)) {
-          m.setValid();
-          ctx.result(gson.toJson(m));
-          board.setTurn(1);
-        } else {
-          m.setInvalid();
-          ctx.result(gson.toJson(m));
-        }
-        
-        if (board.checkWin(2, x, y)) {
-          Message win = new Message();
-          win.setWin(2);
-          ctx.result(gson.toJson(win));
-        }
-        
-        String json = gson.toJson(board);
-        sendGameBoardToAllPlayers(json);
-      } else {
-        Gson gson = new Gson();
-        Message m = new Message();
-        m.setInvalid();
-        ctx.result(gson.toJson(m));
-      }
+    // startgame Endpoint
+    app.post("/startgame", ctx -> {
+      // initialize player 1 and a new game board based on that
+      Player p1 = ctx.bodyAsClass(Player.class);
+      game = new GameBoard(p1);
+      
+      // turn gameboard into json and return
+      Gson gson = new Gson();
+      String gameBoardJson = gson.toJson(game);
+      
+      insertGameBoardJson(gameBoardJson);
+      
+      ctx.result(gameBoardJson);
     });
-    
 
+    
+    // getgame Endpoint to get the gameboard
+    app.get("/getgame", ctx -> {
+      // get the gameboardJSON from database
+      String gameBoardJson = getGameBoardJson();
+      ctx.result(gameBoardJson);
+    });
+    
+    
+    // joingame Endpoint
+    app.post("/joingame", ctx -> {
+      ctx.redirect("/gomoku.html?p=2"); // TODO: Modify to the new pvp address
+
+      // get the gameboardJSON from database
+      String gameBoardJson = getGameBoardJson();
+      // Parse the response to JSON object
+      JSONObject jsonObject = new JSONObject(gameBoardJson);
+      // GSON use to parse data to object
+      Gson gson = new Gson();
+      // update the GameBoard to the most current version 
+      game = gson.fromJson(jsonObject.toString(), GameBoard.class);
+      
+      // get p2 directly from JSON
+      Player p2 = ctx.bodyAsClass(Player.class);
+      game.setP2(p2); // add p2 to current game
+      game.setGameStarted(true); // update game status
+      
+      // update players' view
+      // turn gameboard into json and broadcast
+      gameBoardJson = gson.toJson(game);
+      updateGameBoardJson(gameBoardJson);
+
+      sendGameBoardToAllPlayers(gameBoardJson);
+      ctx.result(gameBoardJson);
+    });
+
+
+    // move endpoint
+    app.post("/move/:playerId", ctx -> {
+      // get the gameboardJSON from database
+      String gameBoardJson = getGameBoardJson();
+      // Parse the response to JSON object
+      JSONObject jsonObject = new JSONObject(gameBoardJson);
+      // GSON use to parse data to object
+      Gson gson = new Gson();
+      // update the GameBoard to the most current version 
+      game = gson.fromJson(jsonObject.toString(), GameBoard.class);
+      
+      // convert the request into Move class
+      Move currentMove = new Move();
+      String playerId = ctx.pathParam("playerId"); // convert path param into int
+      if (playerId.equals(game.getP1().getId())) {
+        currentMove.setPlayer(game.getP1());
+      } else if (playerId.equals(game.getP2().getId())) { 
+        currentMove.setPlayer(game.getP2());
+      }
+      // read the X and Y positions of move from request positions
+      String[] info = ctx.body().split("&");
+      int x = Integer.parseInt(info[0].split("=")[1]);
+      int y = Integer.parseInt(info[1].split("=")[1]);
+      currentMove.setMoveX(x);
+      currentMove.setMoveY(y);
+      
+      // decide move validity and return message
+      Message myMes = checkMoveValidity(currentMove);
+      // send out the message
+      gson = new Gson();
+      String myMesJson = gson.toJson(myMes);
+      ctx.result(myMesJson);
+      
+      // if move is valid update the game board and compute game logic
+      if (myMes.getMoveValidity() == true) {
+        // update the gameboard
+        char[][] currentBoard = game.getBoardState();
+        currentBoard[currentMove.getMoveX()][currentMove.getMoveY()] =
+            currentMove.getPlayer().getType();
+        game.setBoardState(currentBoard);
+        // decide game winner or game draw
+        gameJudge(currentMove);
+        game.setTurn(game.getTurn() + 1); // increase the turn counter
+      }
+      
+      // update the players' views
+      // turn the gameboard into json and broadcast
+      gameBoardJson = gson.toJson(game);
+      sendGameBoardToAllPlayers(gameBoardJson);
+      
+      updateGameBoardJson(gameBoardJson);
+    });
+    
     // Web sockets - DO NOT DELETE or CHANGE
     app.ws("/gameboard", new UiWebSocket());
   }
@@ -157,5 +185,289 @@ public class PlayGame {
 
   public static void stop() {
     app.stop();
+  }
+
+  /** Function to check move validity.
+   * @return a Message to be sent back to player.
+   */
+  private static Message checkMoveValidity(Move currentMove) {
+    // initialize a message to be sent
+    Message myMes = new Message();
+    int yourTurn = 2 - game.getTurn() % 2;
+    // check for move Validity
+    if (game.isGameStarted() == false) {
+      // invalid if game is not yet started
+      myMes.setNotStarted();
+    } else if (currentMove.getPlayer() == null) {
+      // invalid if player is not in this game
+      myMes.setWrongPlayer();
+    }  else if (game.isDraw() == true || game.getWinner() != 0) {
+      // invalid if game already ended
+      myMes.setEnded();
+    } else if (yourTurn == 1 && !game.getP1().getId().equals(currentMove.getPlayer().getId())) {
+      // invalid if same player keeps playing
+      myMes.setWrongTurn(yourTurn);
+    } else if (yourTurn == 2 && !game.getP2().getId().equals(currentMove.getPlayer().getId())) {
+      // invalid if same player keeps playing
+      myMes.setWrongTurn(yourTurn);
+    } else if (game.getBoardState()[currentMove.getMoveX()][currentMove.getMoveY()] != '\u0000') {
+      // invalid if gameboard position is filled
+      myMes.setPositionFilled();
+    } else {
+      myMes.setValid();
+    }
+    return myMes;
+  }
+  
+  /** Function to compute whether the game has ended. The game logic.
+   * @return nothing but update the global variable gameboard
+   */
+  private static void gameJudge(Move currentMove) {
+    // determine if any player wins
+    char[][] currentBoard = game.getBoardState();
+    int yourTurn = 2 - game.getTurn() % 2; // p1 / p2 's turn
+    
+    // check rows and columns
+    for (int i = 0; i < 15; i++) {
+      // check rows
+      int count = 0;
+      if (currentBoard[i][0] != '\u0000') {
+        count = 1;
+      }
+      for (int j = 1; j < 15; j++) {
+        if (currentBoard[i][j] != '\u0000' && currentBoard[i][j] == currentBoard[i][j - 1]) {
+          count += 1;
+        } else if (currentBoard[i][j] != '\u0000') {
+          count = 1;
+        }
+        if (count >= 5) {
+          game.setWinner(yourTurn);
+          return;
+        }
+      }
+      // check columns
+      int countC = 0;
+      if (currentBoard[0][i] != '\u0000') {
+        countC = 1;
+      }
+      for (int j = 1; j < 15; j++) {
+        if (currentBoard[j][i] != '\u0000' && currentBoard[j][i] == currentBoard[j - 1][i]) {
+          countC += 1;
+        } else if (currentBoard[j][i] != '\u0000') {
+          countC = 1;
+        }
+        if (countC >= 5) {
+          game.setWinner(yourTurn);
+          return;
+        }
+      }
+    }
+    
+    // check diagonals
+    int posx = 10;
+    int posy = 0;
+    for (int i = 0; i < 21; i++) {
+      int x = posx;
+      int y = posy;
+      int count = 0;
+      if (currentBoard[x][y] != '\u0000') {
+        count = 1;
+      }
+      while (x < 14 && y < 14) {
+        x++;
+        y++;
+        if (currentBoard[x][y] != '\u0000' && currentBoard[x][y] == currentBoard[x - 1][y - 1]) {
+          count += 1;
+        } else if (currentBoard[x][y] != '\u0000') {
+          count = 1;
+        }
+        if (count >= 5) {
+          game.setWinner(yourTurn);
+          return;
+        }
+      }
+      if (posx > 0) {
+        posx--;
+      } else {
+        posy++;
+      }
+    }
+
+    // check antidiagonals
+    posx = 10;
+    posy = 14;
+    for (int i = 0; i < 21; i++) {
+      int x = posx;
+      int y = posy;
+      int count = 0;
+      if (currentBoard[x][y] != '\u0000') {
+        count = 1;
+      }
+      while (x < 14 && y > 0) {
+        x++;
+        y--;
+        if (currentBoard[x][y] != '\u0000' && currentBoard[x][y] == currentBoard[x - 1][y + 1]) {
+          count += 1;
+        } else if (currentBoard[x][y] != '\u0000') {
+          count = 1;
+        }
+        if (count >= 5) {
+          game.setWinner(yourTurn);
+          return;
+        }
+      }
+      if (posx > 0) {
+        posx--;
+      } else {
+        posy--;
+      }
+    }
+    // determine if it is draw if the game board is filled and no one wins
+    if (game.getTurn() == 225) {
+      game.setDraw(true);
+    }
+  }
+  
+  /** This function cleans the table gameboard, which holds current games.
+   * @throws SQLException any exception can be caused by the sql connection
+   */
+  private static void cleanGameBoardJson() throws SQLException {
+    // Connect to database
+    Connection c = null;
+    Statement stmt = null;
+    try {
+      Class.forName("org.sqlite.JDBC");
+      c = DriverManager.getConnection("jdbc:sqlite:gamestate.db");
+      c.setAutoCommit(false);
+      System.out.println("Opened database successfully");
+      // Clean the gameboard JSON
+      stmt = c.createStatement();
+      String sql = "DELETE from GAMEBOARD where ID=1;";
+      stmt.executeUpdate(sql);
+      c.commit();
+      stmt.close();
+      c.close();
+    } catch (Exception e) {
+      if (stmt != null) {
+        stmt.close();
+      }
+      if (c != null) {
+        c.close();
+      }
+      System.err.println(e.getClass().getName() + ": " + e.getMessage());
+      System.exit(0);
+    }
+    System.out.println("Gameboard database cleaned successfully!");
+  }
+  
+  /** This function updates the gameboard JSON to table gameboard, which holds current games.
+   * @param gameBoardJson the gameboard JSON
+   * @throws SQLException any exception can be caused by the sql connection
+   */
+  private static void insertGameBoardJson(String gameBoardJson) throws SQLException {  
+    // Connect to database
+    Connection c = null;
+    PreparedStatement stmt = null;
+    try {
+      Class.forName("org.sqlite.JDBC");
+      c = DriverManager.getConnection("jdbc:sqlite:gamestate.db");
+      c.setAutoCommit(false);
+      System.out.println("Opened database successfully");
+      // Insert the gameboard JSON to database
+      stmt = c.prepareStatement("INSERT INTO GAMEBOARD (ID,GAMEBOARDJSON) " + "VALUES (1, ?);");
+      stmt.setString(1, gameBoardJson);
+      stmt.executeUpdate();
+      c.commit();
+      stmt.close();
+      c.close();
+    } catch (Exception e) {
+      if (stmt != null) {
+        stmt.close();
+      }
+      if (c != null) {
+        c.close();
+      }
+      System.err.println(e.getClass().getName() + ": " + e.getMessage());
+      System.exit(0);
+    }
+    System.out.println("Gameboard JSON inserted successfully!");
+  }
+  
+  /** Getter function, it gets the gameboard JSON from table gameboard, which holds current games.
+   * @return gameboard JSON
+   * @throws SQLException any exception can be caused by the sql connection
+   */
+  private static String getGameBoardJson() throws SQLException {
+    String gameBoardJson = null;
+    
+    // Connect to database
+    Connection c = null;
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+      Class.forName("org.sqlite.JDBC");
+      c = DriverManager.getConnection("jdbc:sqlite:gamestate.db");
+      c.setAutoCommit(false);
+      System.out.println("Opened database successfully");
+      // Select the gameboard JSON from database
+      stmt = c.createStatement();
+      rs = stmt.executeQuery("SELECT * FROM GAMEBOARD;");
+      
+      while (rs.next()) {
+        gameBoardJson = rs.getString("gameboardjson");
+      }
+      rs.close();
+      stmt.close();
+      c.close();
+    } catch (Exception e) {
+      if (stmt != null) {
+        stmt.close();
+      }
+      if (rs != null) {
+        rs.close();
+      }
+      if (c != null) {
+        c.close();
+      }
+      System.err.println(e.getClass().getName() + ": " + e.getMessage());
+      System.exit(0);
+    }
+    System.out.println("Gameboard JSON selected successfully!");
+    return gameBoardJson;
+  }
+
+  
+  /** This function updates the gameboard JSON to table gameboard, which holds current games.
+   * @param gameBoardJson the gameboard JSON
+   * @throws SQLException any exception can be caused by the sql connection
+   */
+  private static void updateGameBoardJson(String gameBoardJson) throws SQLException {
+    // Connect to database
+    Connection c = null;
+    PreparedStatement stmt = null;
+    try {
+      Class.forName("org.sqlite.JDBC");
+      c = DriverManager.getConnection("jdbc:sqlite:gamestate.db");
+      c.setAutoCommit(false);
+      System.out.println("Opened database successfully");
+      // Update the gameboard JSON in database
+      stmt = c.prepareStatement("UPDATE GAMEBOARD set GAMEBOARDJSON=? where ID=1;");
+      stmt.setString(1, gameBoardJson);
+      stmt.executeUpdate();
+      c.commit();
+      stmt.close();
+      c.close();
+    } catch (Exception e) {
+      if (stmt != null) {
+        stmt.close();
+      }
+      if (c != null) {
+        c.close();
+      }
+      System.err.println(e.getClass().getName() + ": " + e.getMessage());
+      System.exit(0);
+    }
+    System.out.println("Gameboard JSON updated successfully!");
+    
   }
 }
