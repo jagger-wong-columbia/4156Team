@@ -62,7 +62,7 @@ class PlayGame {
     // startgame Endpoint
     app.post("/startgame", ctx -> {
       // initialize player 1 and a new game board based on that
-      Player p1 = ctx.bodyAsClass(Player.class);
+      Player p1 = new Player(ctx.body().charAt(5), "1");
       game = new GameBoard(p1);
       
       // turn gameboard into json and return
@@ -84,7 +84,7 @@ class PlayGame {
     
     
     // joingame Endpoint
-    app.post("/joingame", ctx -> {
+    app.get("/joingame", ctx -> {
       ctx.redirect("/gomoku.html?p=2"); // TODO: Modify to the new pvp address
 
       // get the gameboardJSON from database
@@ -96,8 +96,14 @@ class PlayGame {
       // update the GameBoard to the most current version 
       game = gson.fromJson(jsonObject.toString(), GameBoard.class);
       
-      // get p2 directly from JSON
-      Player p2 = ctx.bodyAsClass(Player.class);
+      // decide p2's type and initialize p2
+      char p2Type;
+      if (game.getP1().getType() == 'X') {
+        p2Type = 'O';
+      } else {
+        p2Type = 'X';
+      }
+      Player p2 = new Player(p2Type, "2");
       game.setP2(p2); // add p2 to current game
       game.setGameStarted(true); // update game status
       
