@@ -2,7 +2,7 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>CodePen - Gomoku JS</title>
+  <title>Rock21 - Gomoku</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
 <link rel="stylesheet" href="./gomokustyle.css">
 
@@ -17,10 +17,10 @@
         <div class="newMainText">new</div>
       </label>
       <div class="newContainer">
-        <div class="newPlate">
+        <div class="newPlate" onclick="startgame('O')">
           <div class="boardCellCircle" id="new-O"></div>
         </div>
-        <div class="newPlate">
+        <div class="newPlate" onclick="startgame('X')">
           <div class="boardCellCross" id="new-X"></div>
         </div>
       </div>
@@ -43,714 +43,758 @@
   </div>
   <div class="board">
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 0)">
         <div class="boardCell" id="0-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 1)">
         <div class="boardCell" id="0-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 2)">
         <div class="boardCell" id="0-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 3)">
         <div class="boardCell" id="0-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 4)">
         <div class="boardCell" id="0-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 5)">
         <div class="boardCell" id="0-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 6)">
         <div class="boardCell" id="0-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 7)">
         <div class="boardCell" id="0-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 8)">
         <div class="boardCell" id="0-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 9)">
         <div class="boardCell" id="0-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 10)">
         <div class="boardCell" id="0-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 11)">
         <div class="boardCell" id="0-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 12)">
         <div class="boardCell" id="0-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 13)">
         <div class="boardCell" id="0-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(0, 14)">
         <div class="boardCell" id="0-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 0)">
         <div class="boardCell" id="1-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 1)">
         <div class="boardCell" id="1-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 2)">
         <div class="boardCell" id="1-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 3)">
         <div class="boardCell" id="1-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 4)">
         <div class="boardCell" id="1-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 5)">
         <div class="boardCell" id="1-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 6)">
         <div class="boardCell" id="1-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 7)">
         <div class="boardCell" id="1-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 8)">
         <div class="boardCell" id="1-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 9)">
         <div class="boardCell" id="1-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 10)">
         <div class="boardCell" id="1-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 11)">
         <div class="boardCell" id="1-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 12)">
         <div class="boardCell" id="1-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 13)">
         <div class="boardCell" id="1-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(1, 14)">
         <div class="boardCell" id="1-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 0)">
         <div class="boardCell" id="2-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 1)">
         <div class="boardCell" id="2-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 2)">
         <div class="boardCell" id="2-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 3)">
         <div class="boardCell" id="2-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 4)">
         <div class="boardCell" id="2-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 5)">
         <div class="boardCell" id="2-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 6)">
         <div class="boardCell" id="2-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 7)">
         <div class="boardCell" id="2-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 8)">
         <div class="boardCell" id="2-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 9)">
         <div class="boardCell" id="2-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 10)">
         <div class="boardCell" id="2-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 11)">
         <div class="boardCell" id="2-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 12)">
         <div class="boardCell" id="2-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 13)">
         <div class="boardCell" id="2-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(2, 14)">
         <div class="boardCell" id="2-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 0)">
         <div class="boardCell" id="3-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 1)">
         <div class="boardCell" id="3-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 2)">
         <div class="boardCell" id="3-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 3)">
         <div class="boardCell" id="3-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 4)">
         <div class="boardCell" id="3-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 5)">
         <div class="boardCell" id="3-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 6)">
         <div class="boardCell" id="3-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 7)">
         <div class="boardCell" id="3-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 8)">
         <div class="boardCell" id="3-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 9)">
         <div class="boardCell" id="3-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 10)">
         <div class="boardCell" id="3-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 11)">
         <div class="boardCell" id="3-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 12)">
         <div class="boardCell" id="3-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 13)">
         <div class="boardCell" id="3-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(3, 14)">
         <div class="boardCell" id="3-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 0)">
         <div class="boardCell" id="4-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 1)">
         <div class="boardCell" id="4-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 2)">
         <div class="boardCell" id="4-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 3)">
         <div class="boardCell" id="4-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 4)">
         <div class="boardCell" id="4-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 5)">
         <div class="boardCell" id="4-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 6)">
         <div class="boardCell" id="4-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 7)">
         <div class="boardCell" id="4-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 8)">
         <div class="boardCell" id="4-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 9)">
         <div class="boardCell" id="4-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 10)">
         <div class="boardCell" id="4-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 11)">
         <div class="boardCell" id="4-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 12)">
         <div class="boardCell" id="4-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 13)">
         <div class="boardCell" id="4-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(4, 14)">
         <div class="boardCell" id="4-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 0)">
         <div class="boardCell" id="5-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 1)">
         <div class="boardCell" id="5-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 2)">
         <div class="boardCell" id="5-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 3)">
         <div class="boardCell" id="5-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 4)">
         <div class="boardCell" id="5-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 5)">
         <div class="boardCell" id="5-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 6)">
         <div class="boardCell" id="5-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 7)">
         <div class="boardCell" id="5-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 8)">
         <div class="boardCell" id="5-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 9)">
         <div class="boardCell" id="5-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 10)">
         <div class="boardCell" id="5-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 11)">
         <div class="boardCell" id="5-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 12)">
         <div class="boardCell" id="5-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 13)">
         <div class="boardCell" id="5-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(5, 14)">
         <div class="boardCell" id="5-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 0)">
         <div class="boardCell" id="6-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 1)">
         <div class="boardCell" id="6-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 2)">
         <div class="boardCell" id="6-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 3)">
         <div class="boardCell" id="6-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 4)">
         <div class="boardCell" id="6-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 5)">
         <div class="boardCell" id="6-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 6)">
         <div class="boardCell" id="6-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 7)">
         <div class="boardCell" id="6-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 8)">
         <div class="boardCell" id="6-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 9)">
         <div class="boardCell" id="6-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 10)">
         <div class="boardCell" id="6-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 11)">
         <div class="boardCell" id="6-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 12)">
         <div class="boardCell" id="6-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 13)">
         <div class="boardCell" id="6-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(6, 14)">
         <div class="boardCell" id="6-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 0)">
         <div class="boardCell" id="7-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 1)">
         <div class="boardCell" id="7-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 2)">
         <div class="boardCell" id="7-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 3)">
         <div class="boardCell" id="7-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 4)">
         <div class="boardCell" id="7-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 5)">
         <div class="boardCell" id="7-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 6)">
         <div class="boardCell" id="7-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 7)">
         <div class="boardCell" id="7-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 8)">
         <div class="boardCell" id="7-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 9)">
         <div class="boardCell" id="7-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 10)">
         <div class="boardCell" id="7-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 11)">
         <div class="boardCell" id="7-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 12)">
         <div class="boardCell" id="7-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 13)">
         <div class="boardCell" id="7-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(7, 14)">
         <div class="boardCell" id="7-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 0)">
         <div class="boardCell" id="8-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 1)">
         <div class="boardCell" id="8-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 2)">
         <div class="boardCell" id="8-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 3)">
         <div class="boardCell" id="8-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 4)">
         <div class="boardCell" id="8-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 5)">
         <div class="boardCell" id="8-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 6)">
         <div class="boardCell" id="8-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 7)">
         <div class="boardCell" id="8-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 8)">
         <div class="boardCell" id="8-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 9)">
         <div class="boardCell" id="8-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 10)">
         <div class="boardCell" id="8-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 11)">
         <div class="boardCell" id="8-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 12)">
         <div class="boardCell" id="8-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 13)">
         <div class="boardCell" id="8-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(8, 14)">
         <div class="boardCell" id="8-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 0)">
         <div class="boardCell" id="9-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 1)">
         <div class="boardCell" id="9-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 2)">
         <div class="boardCell" id="9-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 3)">
         <div class="boardCell" id="9-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 4)">
         <div class="boardCell" id="9-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 5)">
         <div class="boardCell" id="9-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 6)">
         <div class="boardCell" id="9-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 7)">
         <div class="boardCell" id="9-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 8)">
         <div class="boardCell" id="9-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 9)">
         <div class="boardCell" id="9-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 10)">
         <div class="boardCell" id="9-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 11)">
         <div class="boardCell" id="9-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 12)">
         <div class="boardCell" id="9-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 13)">
         <div class="boardCell" id="9-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(9, 14)">
         <div class="boardCell" id="9-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 0)">
         <div class="boardCell" id="10-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 1)">
         <div class="boardCell" id="10-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 2)">
         <div class="boardCell" id="10-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 3)">
         <div class="boardCell" id="10-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 4)">
         <div class="boardCell" id="10-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 5)">
         <div class="boardCell" id="10-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 6)">
         <div class="boardCell" id="10-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 7)">
         <div class="boardCell" id="10-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 8)">
         <div class="boardCell" id="10-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 9)">
         <div class="boardCell" id="10-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 10)">
         <div class="boardCell" id="10-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 11)">
         <div class="boardCell" id="10-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 12)">
         <div class="boardCell" id="10-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 13)">
         <div class="boardCell" id="10-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(10, 14)">
         <div class="boardCell" id="10-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 0)">
         <div class="boardCell" id="11-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 1)">
         <div class="boardCell" id="11-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 2)">
         <div class="boardCell" id="11-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 3)">
         <div class="boardCell" id="11-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 4)">
         <div class="boardCell" id="11-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 5)">
         <div class="boardCell" id="11-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 6)">
         <div class="boardCell" id="11-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 7)">
         <div class="boardCell" id="11-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 8)">
         <div class="boardCell" id="11-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 9)">
         <div class="boardCell" id="11-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 10)">
         <div class="boardCell" id="11-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 11)">
         <div class="boardCell" id="11-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 12)">
         <div class="boardCell" id="11-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 13)">
         <div class="boardCell" id="11-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(11, 14)">
         <div class="boardCell" id="11-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 0)">
         <div class="boardCell" id="12-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 1)">
         <div class="boardCell" id="12-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 2)">
         <div class="boardCell" id="12-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 3)">
         <div class="boardCell" id="12-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 4)">
         <div class="boardCell" id="12-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 5)">
         <div class="boardCell" id="12-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 6)">
         <div class="boardCell" id="12-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 7)">
         <div class="boardCell" id="12-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 8)">
         <div class="boardCell" id="12-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 9)">
         <div class="boardCell" id="12-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 10)">
         <div class="boardCell" id="12-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 11)">
         <div class="boardCell" id="12-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 12)">
         <div class="boardCell" id="12-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 13)">
         <div class="boardCell" id="12-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(12, 14)">
         <div class="boardCell" id="12-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 0)">
         <div class="boardCell" id="13-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 1)">
         <div class="boardCell" id="13-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 2)">
         <div class="boardCell" id="13-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 3)">
         <div class="boardCell" id="13-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 4)">
         <div class="boardCell" id="13-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 5)">
         <div class="boardCell" id="13-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 6)">
         <div class="boardCell" id="13-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 7)">
         <div class="boardCell" id="13-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 8)">
         <div class="boardCell" id="13-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 9)">
         <div class="boardCell" id="13-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 10)">
         <div class="boardCell" id="13-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 11)">
         <div class="boardCell" id="13-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 12)">
         <div class="boardCell" id="13-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 13)">
         <div class="boardCell" id="13-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(13, 14)">
         <div class="boardCell" id="13-14"></div>
       </div>
     </div>
     <div class="boardRow">
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 0)">
         <div class="boardCell" id="14-0"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 1)">
         <div class="boardCell" id="14-1"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 2)">
         <div class="boardCell" id="14-2"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 3)">
         <div class="boardCell" id="14-3"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 4)">
         <div class="boardCell" id="14-4"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 5)">
         <div class="boardCell" id="14-5"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 6)">
         <div class="boardCell" id="14-6"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 7)">
         <div class="boardCell" id="14-7"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 8)">
         <div class="boardCell" id="14-8"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 9)">
         <div class="boardCell" id="14-9"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 10)">
         <div class="boardCell" id="14-10"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 11)">
         <div class="boardCell" id="14-11"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 12)">
         <div class="boardCell" id="14-12"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 13)">
         <div class="boardCell" id="14-13"></div>
       </div>
-      <div class="boardCol">
+      <div class="boardCol" onclick="move(14, 14)">
         <div class="boardCell" id="14-14"></div>
       </div>
     </div>
   </div>
 </section>
 <!-- partial -->
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script><script  src="./script.js"></script>
+  <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script><script  src="./script.js"></script> -->
+  <script language="javascript" type="text/javascript"> 
+    
+    function startgame(move) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST","http://localhost:8080/startgame",true);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xhr.onload = function() {
+        var xhr1 = new XMLHttpRequest();
+        xhr1.open("GET","http://localhost:8080/joingame",true);
+        xhr1.send();
+      };
+      xhr.send(move);
+    }
+  </script> 
+
+  <script language="javascript" type="text/javascript"> 
+    var currentMove = "boardCellCross";
+    var xhr = new XMLHttpRequest();
+
+    function move(row, col) {
+        document.getElementById(row + "-" + col).className= currentMove;
+        console.log("Make a move in " + row + "," + col);
+
+        if(currentMove == "boardCellCross") currentMove = "boardCellCircle";
+        else currentMove = "boardCellCross";
+    }
+
+    function GetRequest() {  
+      var url = location.search;
+      //获取url中"?"符后的字串  
+      var theRequest = new Object(); 
+
+      if (url.indexOf("?") != -1) { 
+        var str = url.substr(1); 
+        strs = str.split("&");  
+        for(var i = 0; i < strs.length; i ++) {  
+            // theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
+            theRequest[strs[i].split("=")[0]]=strs[i].split("=")[1];
+        }  
+      }  
+      console.log(theRequest);  
+    }  
+
+  </script>
 
 </body>
 </html>

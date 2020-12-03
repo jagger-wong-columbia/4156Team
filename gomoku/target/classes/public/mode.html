@@ -9,11 +9,19 @@
   <form>
     <h1>Choose Mode</h1>
     <script>
-        function jump2(){
-            window.location.href="gomoku.html";
-        }
+
+      function jump1(){
+        var xhr1 = new XMLHttpRequest();
+        xhr1.open("GET","http://localhost:8080/newgame",true);
+        xhr1.send();
+        window.location.href="p2p.html?p=1";
+      }
+
+      function jump2(){
+          window.location.href="gomoku.html";
+      }
     </script>
-    <button>Play with your friend!</button>
+    <button type="button" value="Play with our AI" onclick=javascript:jump1()>Play with your friend!</button>
     <!-- <button onclick=javascrtpt:jump2()>Play with our AI</button> -->
     <button type="button" value="Play with our AI" onclick=javascript:jump2()>Play with our AI</button>
   </form>
