@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Queue;
-import kong.unirest.json.JSONObject;
 import models.GameBoard;
 import models.Message;
 import models.Move;
@@ -89,12 +88,10 @@ class PlayGame {
 
       // get the gameboardJSON from database
       String gameBoardJson = getGameBoardJson();
-      // Parse the response to JSON object
-      JSONObject jsonObject = new JSONObject(gameBoardJson);
       // GSON use to parse data to object
       Gson gson = new Gson();
       // update the GameBoard to the most current version 
-      game = gson.fromJson(jsonObject.toString(), GameBoard.class);
+      game = gson.fromJson(gameBoardJson, GameBoard.class);
       
       // decide p2's type and initialize p2
       char p2Type;
@@ -118,26 +115,25 @@ class PlayGame {
 
 
     // move endpoint
-    app.post("/move/:playerId", ctx -> {
+    //app.post("/move/:playerId", ctx -> {
+    app.post("/move", ctx -> {
       // get the gameboardJSON from database
       String gameBoardJson = getGameBoardJson();
-      // Parse the response to JSON object
-      JSONObject jsonObject = new JSONObject(gameBoardJson);
       // GSON use to parse data to object
       Gson gson = new Gson();
       // update the GameBoard to the most current version 
-      game = gson.fromJson(jsonObject.toString(), GameBoard.class);
+      game = gson.fromJson(gameBoardJson, GameBoard.class);
       
       // convert the request into Move class
       Move currentMove = new Move();
-      String playerId = ctx.pathParam("playerId"); // convert path param into int
+      // read all the infos from the request body
+      String[] info = ctx.body().split("&");
+      String playerId = info[2].split("=")[1];
       if (playerId.equals(game.getP1().getId())) {
         currentMove.setPlayer(game.getP1());
       } else if (playerId.equals(game.getP2().getId())) { 
         currentMove.setPlayer(game.getP2());
       }
-      // read the X and Y positions of move from request positions
-      String[] info = ctx.body().split("&");
       int x = Integer.parseInt(info[0].split("=")[1]);
       int y = Integer.parseInt(info[1].split("=")[1]);
       currentMove.setMoveX(x);
