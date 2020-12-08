@@ -96,4 +96,137 @@ public class GameBoard {
     this.isDraw = isDraw;
   }
 
+  /** Automatically set P2 based on the type of P1.
+   */
+  public void autoSetP2() {
+    char p2Type;
+    if (this.getP1().getType() == 'X') {
+      p2Type = 'O';
+    } else {
+      p2Type = 'X';
+    }
+    Player p2 = new Player(p2Type, "2");
+    this.setP2(p2); // add p2 to current game
+  }
+
+  /** Update the GameBoard based on the valid move.
+   * @param currentMove the valid move accepted by the game
+   */
+  public void update(Move currentMove) {
+    // update the gameboard
+    this.boardState[currentMove.getMoveX()][currentMove.getMoveY()] =
+          currentMove.getPlayer().getType();
+    // decide game winner or game draw
+    this.gameJudge(currentMove);
+    this.setTurn(this.getTurn() + 1); // increase the turn counter
+  }
+  
+  /** Function to compute whether the game has ended. The game logic.
+   * @param currentMove the valid move accepted by the game
+   */
+  public void gameJudge(Move currentMove) {
+    // determine if any player wins
+    char[][] currentBoard = this.getBoardState();
+    int yourTurn = 2 - this.getTurn() % 2; // p1 / p2 's turn
+    
+    // check rows and columns
+    for (int i = 0; i < 15; i++) {
+      // check rows
+      int count = 0;
+      if (currentBoard[i][0] != '\u0000') {
+        count = 1;
+      }
+      for (int j = 1; j < 15; j++) {
+        if (currentBoard[i][j] != '\u0000' && currentBoard[i][j] == currentBoard[i][j - 1]) {
+          count += 1;
+        } else if (currentBoard[i][j] != '\u0000') {
+          count = 1;
+        }
+        if (count >= 5) {
+          this.setWinner(yourTurn);
+          return;
+        }
+      }
+      // check columns
+      int countC = 0;
+      if (currentBoard[0][i] != '\u0000') {
+        countC = 1;
+      }
+      for (int j = 1; j < 15; j++) {
+        if (currentBoard[j][i] != '\u0000' && currentBoard[j][i] == currentBoard[j - 1][i]) {
+          countC += 1;
+        } else if (currentBoard[j][i] != '\u0000') {
+          countC = 1;
+        }
+        if (countC >= 5) {
+          this.setWinner(yourTurn);
+          return;
+        }
+      }
+    }
+    
+    // check diagonals
+    int posx = 10;
+    int posy = 0;
+    for (int i = 0; i < 21; i++) {
+      int x = posx;
+      int y = posy;
+      int count = 0;
+      if (currentBoard[x][y] != '\u0000') {
+        count = 1;
+      }
+      while (x < 14 && y < 14) {
+        x++;
+        y++;
+        if (currentBoard[x][y] != '\u0000' && currentBoard[x][y] == currentBoard[x - 1][y - 1]) {
+          count += 1;
+        } else if (currentBoard[x][y] != '\u0000') {
+          count = 1;
+        }
+        if (count >= 5) {
+          this.setWinner(yourTurn);
+          return;
+        }
+      }
+      if (posx > 0) {
+        posx--;
+      } else {
+        posy++;
+      }
+    }
+
+    // check antidiagonals
+    posx = 10;
+    posy = 14;
+    for (int i = 0; i < 21; i++) {
+      int x = posx;
+      int y = posy;
+      int count = 0;
+      if (currentBoard[x][y] != '\u0000') {
+        count = 1;
+      }
+      while (x < 14 && y > 0) {
+        x++;
+        y--;
+        if (currentBoard[x][y] != '\u0000' && currentBoard[x][y] == currentBoard[x - 1][y + 1]) {
+          count += 1;
+        } else if (currentBoard[x][y] != '\u0000') {
+          count = 1;
+        }
+        if (count >= 5) {
+          this.setWinner(yourTurn);
+          return;
+        }
+      }
+      if (posx > 0) {
+        posx--;
+      } else {
+        posy--;
+      }
+    }
+    // determine if it is draw if the game board is filled and no one wins
+    if (this.getTurn() == 225) {
+      this.setDraw(true);
+    }
+  }
 }

@@ -72,7 +72,7 @@ public class GameTest {
     // Remember to use asString() only once for an endpoint call. Every time you call asString(),
     // a new request will be sent to the endpoint. 
     // Call it once and then use the data in the object.
-    HttpResponse<String> response = Unirest.post("http://localhost:8080/startgame").body("{\"type\": \"X\",\"id\": \"9823sx\"}").asString();
+    HttpResponse<String> response = Unirest.post("http://localhost:8080/startgame").body("type=X").asString();
     String responseBody = response.getBody();
     
     // --------------------------- JSONObject Parsing ----------------------------------
@@ -108,7 +108,7 @@ public class GameTest {
   public void moveBeforeJoinTest() {
         
     // Create HTTP POST request for Move and get response(Message)
-    HttpResponse<String> response = Unirest.post("http://localhost:8080/move/9823sx").body("x=1&y=1").asString();
+    HttpResponse<String> response = Unirest.post("http://localhost:8080/move").body("x=1&y=1&turn=1").asString();
     String responseBody = response.getBody();
     
     // --------------------------- JSONObject Parsing ----------------------------------
@@ -138,7 +138,7 @@ public class GameTest {
   public void joinGameTest() {
         
     // Create HTTP request for joingame and get response
-    HttpResponse<?> response = Unirest.post("http://localhost:8080/joingame").body("{\"type\": \"O\",\"id\": \"87xsi7\"}").asString();
+    HttpResponse<?> response = Unirest.get("http://localhost:8080/joingame").asString();
     int restStatus = response.getStatus();
         
     // Check if joingame works well
@@ -185,7 +185,7 @@ public class GameTest {
   public void p2FirstMoveTest() {
         
     // Create HTTP POST request for Move and get response(Message)
-    HttpResponse<String> response = Unirest.post("http://localhost:8080/move/87xsi7").body("x=0&y=2").asString();
+    HttpResponse<String> response = Unirest.post("http://localhost:8080/move").body("x=0&y=2&turn=2").asString();
     String responseBody = response.getBody();
     
     // --------------------------- JSONObject Parsing ----------------------------------
@@ -231,8 +231,8 @@ public class GameTest {
   public void p1TwoMoveTest() {
     
     // Create two HTTP POST request for Move and get response(Message) of second move
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=0&y=2").asString();
-    HttpResponse<String> response = Unirest.post("http://localhost:8080/move/9823sx").body("x=1&y=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=0&y=2&turn=1").asString();
+    HttpResponse<String> response = Unirest.post("http://localhost:8080/move").body("x=1&y=1&turn=1").asString();
     String responseBody = response.getBody();
     
     // --------------------------- JSONObject Parsing ----------------------------------
@@ -282,14 +282,14 @@ public class GameTest {
   public void winGameTest() {
         
     // Create HTTP requests for multiple moves
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=3&y=0").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=1&y=3").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=3&y=1").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=2&y=4").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=3&y=2").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=3&y=5").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=3&y=3").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=4&y=6").asString();
+    Unirest.post("http://localhost:8080/move").body("x=3&y=0&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=1&y=3&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=3&y=1&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=2&y=4&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=3&y=2&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=3&y=5&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=3&y=3&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=4&y=6&turn=1").asString();
     
     // Create HTTP request and get the gameboard
     HttpResponse<String> response = Unirest.get("http://localhost:8080/getgame").asString();
@@ -317,7 +317,7 @@ public class GameTest {
   public void moveAfterEndTest() {
     
     // Create HTTP POST request for Move and get response(Message)
-    HttpResponse<String> response = Unirest.post("http://localhost:8080/move/87xsi7").body("x=12&y=12").asString();
+    HttpResponse<String> response = Unirest.post("http://localhost:8080/move").body("x=12&y=12&turn=2").asString();
     String responseBody = response.getBody();
      
     // --------------------------- JSONObject Parsing ----------------------------------
@@ -343,8 +343,8 @@ public class GameTest {
     
     // Create HTTP POST request for new game, start game and join game
     Unirest.get("http://localhost:8080/newgame").asString();
-    Unirest.post("http://localhost:8080/startgame").body("{\"type\": \"O\",\"id\": \"9823sx\"}").asString();
-    Unirest.post("http://localhost:8080/joingame").body("{\"type\": \"X\",\"id\": \"87xsi7\"}").asString();
+    Unirest.post("http://localhost:8080/startgame").body("type=O").asString();
+    Unirest.get("http://localhost:8080/joingame").asString();
     
     // Testing the echo
     HttpResponse<String> response1 = Unirest.post("http://localhost:8080/echo").body("hi there").asString();
@@ -362,44 +362,6 @@ public class GameTest {
   
   
   /**
-  * This is a test case to check if draw game works properly.
-  * RULE 5
-  */
-  @Test
-  @Order(10)
-  public void drawGameTest() {
-    
-    // Create HTTP POST request for a flow of moves that lead to draw, then get the gameboard
-    Unirest.post("http://localhost:8080/move/1").body("x=0&y=0").asString();
-    Unirest.post("http://localhost:8080/move/2").body("x=0&y=1").asString();
-    Unirest.post("http://localhost:8080/move/1").body("x=0&y=2").asString();
-    Unirest.post("http://localhost:8080/move/2").body("x=1&y=0").asString();
-    Unirest.post("http://localhost:8080/move/1").body("x=1&y=1").asString();
-    Unirest.post("http://localhost:8080/move/2").body("x=2&y=0").asString();
-    Unirest.post("http://localhost:8080/move/1").body("x=1&y=2").asString();
-    Unirest.post("http://localhost:8080/move/2").body("x=2&y=2").asString();
-    Unirest.post("http://localhost:8080/move/1").body("x=2&y=1").asString();
-    HttpResponse<String> response = Unirest.get("http://localhost:8080/getgame").asString();
-    String responseBody = response.getBody();
-    
-    // --------------------------- JSONObject Parsing ----------------------------------
-    
-    System.out.println("Draw Game Response: " + responseBody);
-    
-    // Parse the response to JSON object
-    JSONObject jsonObject = new JSONObject(responseBody);
-
-    // Check if game status is draw
-    assertEquals(true, jsonObject.get("isDraw"));
-    
-    // Check if winner is no one
-    assertEquals(0, jsonObject.get("winner"));
-     
-    System.out.println("Test Draw Game");
-  }
-  
-  
-  /**
   * This is a test case to restart a game and check the response if the board position is filled.
   */
   @Test
@@ -408,10 +370,10 @@ public class GameTest {
     
     // Create HTTP POST request for restart of game, and p2's request to move on a filled position
     Unirest.get("http://localhost:8080/newgame").asString();
-    Unirest.post("http://localhost:8080/startgame").body("{\"type\": \"X\",\"id\": \"9823sx\"}").asString();
-    Unirest.post("http://localhost:8080/joingame").body("{\"type\": \"O\",\"id\": \"87xsi7\"}").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=0&y=0").asString();
-    HttpResponse<String> response = Unirest.post("http://localhost:8080/move/87xsi7").body("x=0&y=0").asString();
+    Unirest.post("http://localhost:8080/startgame").body("type=X").asString();
+    Unirest.get("http://localhost:8080/joingame").asString();
+    Unirest.post("http://localhost:8080/move").body("x=0&y=0&turn=1").asString();
+    HttpResponse<String> response = Unirest.post("http://localhost:8080/move").body("x=0&y=0&turn=2").asString();
     String responseBody = response.getBody();
     
     // --------------------------- JSONObject Parsing ----------------------------------
@@ -437,17 +399,17 @@ public class GameTest {
     
     // Create HTTP POST request for a flow of moves that lead to horizontal win of p2
     // then get the gameboard
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=1&y=0").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=0&y=2").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=1&y=1").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=2&y=2").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=1&y=2").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=4&y=4").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=1&y=3").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=6&y=6").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=1&y=4").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=10&y=14").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=1&y=5").asString();
+    Unirest.post("http://localhost:8080/move").body("x=1&y=0&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=0&y=2&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=1&y=1&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=2&y=2&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=1&y=2&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=4&y=4&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=1&y=3&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=6&y=6&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=1&y=4&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=10&y=14&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=1&y=5&turn=2").asString();
     HttpResponse<String> response = Unirest.get("http://localhost:8080/getgame").asString();
     String responseBody = response.getBody();
     
@@ -475,17 +437,17 @@ public class GameTest {
     // Create HTTP POST request for restart of the game,
     // and a flow of requests to get p1 win vertically
     Unirest.get("http://localhost:8080/newgame").asString();
-    Unirest.post("http://localhost:8080/startgame").body("{\"type\": \"X\",\"id\": \"9823sx\"}").asString();
-    Unirest.post("http://localhost:8080/joingame").body("{\"type\": \"O\",\"id\": \"87xsi7\"}").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=1&y=0").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=6&y=0").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=2&y=0").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=3&y=1").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=3&y=0").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=3&y=2").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=4&y=0").asString();
-    Unirest.post("http://localhost:8080/move/87xsi7").body("x=3&y=3").asString();
-    Unirest.post("http://localhost:8080/move/9823sx").body("x=5&y=0").asString();
+    Unirest.post("http://localhost:8080/startgame").body("type=X").asString();
+    Unirest.get("http://localhost:8080/joingame").asString();
+    Unirest.post("http://localhost:8080/move").body("x=1&y=0&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=6&y=0&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=2&y=0&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=3&y=1&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=3&y=0&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=3&y=2&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=4&y=0&turn=1").asString();
+    Unirest.post("http://localhost:8080/move").body("x=3&y=3&turn=2").asString();
+    Unirest.post("http://localhost:8080/move").body("x=5&y=0&turn=1").asString();
     HttpResponse<String> response = Unirest.get("http://localhost:8080/getgame").asString();
     String responseBody = response.getBody();
     

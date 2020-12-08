@@ -93,15 +93,7 @@ class PlayGame {
       // update the GameBoard to the most current version 
       game = gson.fromJson(gameBoardJson, GameBoard.class);
       
-      // decide p2's type and initialize p2
-      char p2Type;
-      if (game.getP1().getType() == 'X') {
-        p2Type = 'O';
-      } else {
-        p2Type = 'X';
-      }
-      Player p2 = new Player(p2Type, "2");
-      game.setP2(p2); // add p2 to current game
+      game.autoSetP2(); // add p2 to current game
       game.setGameStarted(true); // update game status
       
       // update players' view
@@ -126,21 +118,10 @@ class PlayGame {
       
       // convert the request into Move class
       Move currentMove = new Move();
-      // read all the infos from the request body
-      String[] info = ctx.body().split("&");
-      String playerId = info[2].split("=")[1];
-      if (playerId.equals(game.getP1().getId())) {
-        currentMove.setPlayer(game.getP1());
-      } else if (playerId.equals(game.getP2().getId())) { 
-        currentMove.setPlayer(game.getP2());
-      }
-      int x = Integer.parseInt(info[0].split("=")[1]);
-      int y = Integer.parseInt(info[1].split("=")[1]);
-      currentMove.setMoveX(x);
-      currentMove.setMoveY(y);
+      currentMove.retrieveMove(ctx.body(), game);
       
       // decide move validity and return message
-      Message myMes = checkMoveValidity(currentMove);
+      Message myMes = currentMove.checkMoveValidity(game);
       // send out the message
       gson = new Gson();
       String myMesJson = gson.toJson(myMes);
@@ -148,14 +129,7 @@ class PlayGame {
       
       // if move is valid update the game board and compute game logic
       if (myMes.getMoveValidity() == true) {
-        // update the gameboard
-        char[][] currentBoard = game.getBoardState();
-        currentBoard[currentMove.getMoveX()][currentMove.getMoveY()] =
-            currentMove.getPlayer().getType();
-        game.setBoardState(currentBoard);
-        // decide game winner or game draw
-        gameJudge(currentMove);
-        game.setTurn(game.getTurn() + 1); // increase the turn counter
+        game.update(currentMove);
       }
       
       // update the players' views
@@ -188,147 +162,7 @@ class PlayGame {
   public static void stop() {
     app.stop();
   }
-
-  /** Function to check move validity.
-   * @return a Message to be sent back to player.
-   */
-  private static Message checkMoveValidity(Move currentMove) {
-    // initialize a message to be sent
-    Message myMes = new Message();
-    int yourTurn = 2 - game.getTurn() % 2;
-    // check for move Validity
-    if (game.isGameStarted() == false) {
-      // invalid if game is not yet started
-      myMes.setNotStarted();
-    } else if (currentMove.getPlayer() == null) {
-      // invalid if player is not in this game
-      myMes.setWrongPlayer();
-    }  else if (game.isDraw() == true || game.getWinner() != 0) {
-      // invalid if game already ended
-      myMes.setEnded();
-    } else if (yourTurn == 1 && !game.getP1().getId().equals(currentMove.getPlayer().getId())) {
-      // invalid if same player keeps playing
-      myMes.setWrongTurn(yourTurn);
-    } else if (yourTurn == 2 && !game.getP2().getId().equals(currentMove.getPlayer().getId())) {
-      // invalid if same player keeps playing
-      myMes.setWrongTurn(yourTurn);
-    } else if (game.getBoardState()[currentMove.getMoveX()][currentMove.getMoveY()] != '\u0000') {
-      // invalid if gameboard position is filled
-      myMes.setPositionFilled();
-    } else {
-      myMes.setValid();
-    }
-    return myMes;
-  }
   
-  /** Function to compute whether the game has ended. The game logic.
-   * @return nothing but update the global variable gameboard
-   */
-  private static void gameJudge(Move currentMove) {
-    // determine if any player wins
-    char[][] currentBoard = game.getBoardState();
-    int yourTurn = 2 - game.getTurn() % 2; // p1 / p2 's turn
-    
-    // check rows and columns
-    for (int i = 0; i < 15; i++) {
-      // check rows
-      int count = 0;
-      if (currentBoard[i][0] != '\u0000') {
-        count = 1;
-      }
-      for (int j = 1; j < 15; j++) {
-        if (currentBoard[i][j] != '\u0000' && currentBoard[i][j] == currentBoard[i][j - 1]) {
-          count += 1;
-        } else if (currentBoard[i][j] != '\u0000') {
-          count = 1;
-        }
-        if (count >= 5) {
-          game.setWinner(yourTurn);
-          return;
-        }
-      }
-      // check columns
-      int countC = 0;
-      if (currentBoard[0][i] != '\u0000') {
-        countC = 1;
-      }
-      for (int j = 1; j < 15; j++) {
-        if (currentBoard[j][i] != '\u0000' && currentBoard[j][i] == currentBoard[j - 1][i]) {
-          countC += 1;
-        } else if (currentBoard[j][i] != '\u0000') {
-          countC = 1;
-        }
-        if (countC >= 5) {
-          game.setWinner(yourTurn);
-          return;
-        }
-      }
-    }
-    
-    // check diagonals
-    int posx = 10;
-    int posy = 0;
-    for (int i = 0; i < 21; i++) {
-      int x = posx;
-      int y = posy;
-      int count = 0;
-      if (currentBoard[x][y] != '\u0000') {
-        count = 1;
-      }
-      while (x < 14 && y < 14) {
-        x++;
-        y++;
-        if (currentBoard[x][y] != '\u0000' && currentBoard[x][y] == currentBoard[x - 1][y - 1]) {
-          count += 1;
-        } else if (currentBoard[x][y] != '\u0000') {
-          count = 1;
-        }
-        if (count >= 5) {
-          game.setWinner(yourTurn);
-          return;
-        }
-      }
-      if (posx > 0) {
-        posx--;
-      } else {
-        posy++;
-      }
-    }
-
-    // check antidiagonals
-    posx = 10;
-    posy = 14;
-    for (int i = 0; i < 21; i++) {
-      int x = posx;
-      int y = posy;
-      int count = 0;
-      if (currentBoard[x][y] != '\u0000') {
-        count = 1;
-      }
-      while (x < 14 && y > 0) {
-        x++;
-        y--;
-        if (currentBoard[x][y] != '\u0000' && currentBoard[x][y] == currentBoard[x - 1][y + 1]) {
-          count += 1;
-        } else if (currentBoard[x][y] != '\u0000') {
-          count = 1;
-        }
-        if (count >= 5) {
-          game.setWinner(yourTurn);
-          return;
-        }
-      }
-      if (posx > 0) {
-        posx--;
-      } else {
-        posy--;
-      }
-    }
-    // determine if it is draw if the game board is filled and no one wins
-    if (game.getTurn() == 225) {
-      game.setDraw(true);
-    }
-  }
   
   /** This function cleans the table gameboard, which holds current games.
    * @throws SQLException any exception can be caused by the sql connection
