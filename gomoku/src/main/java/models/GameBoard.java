@@ -32,11 +32,12 @@ public class GameBoard {
     this.turn = 1;
     this.winner = 0;
     this.isDraw = false;
-    char[][] bs = new char[15][15];
-    char[] temp = new char[15];
-    Arrays.fill(temp, '\u0000');
-    Arrays.fill(bs, temp);
-    this.boardState = bs;
+    this.boardState = new char[15][15];
+    for (int i = 0; i < 15; i++) {
+      char[] temp = new char[15];
+      Arrays.fill(temp, '\u0000');
+      this.boardState[i] = temp.clone();
+    }
     
   }
 
@@ -141,6 +142,8 @@ public class GameBoard {
           count += 1;
         } else if (currentBoard[i][j] != '\u0000') {
           count = 1;
+        } else {
+          count = 0;
         }
         if (count >= 5) {
           this.setWinner(yourTurn);
@@ -157,6 +160,8 @@ public class GameBoard {
           countC += 1;
         } else if (currentBoard[j][i] != '\u0000') {
           countC = 1;
+        } else {
+          countC = 0;
         }
         if (countC >= 5) {
           this.setWinner(yourTurn);
@@ -182,6 +187,8 @@ public class GameBoard {
           count += 1;
         } else if (currentBoard[x][y] != '\u0000') {
           count = 1;
+        } else {
+          count = 0;
         }
         if (count >= 5) {
           this.setWinner(yourTurn);
@@ -212,6 +219,8 @@ public class GameBoard {
           count += 1;
         } else if (currentBoard[x][y] != '\u0000') {
           count = 1;
+        } else {
+          count = 0;
         }
         if (count >= 5) {
           this.setWinner(yourTurn);

@@ -138,8 +138,7 @@ public class GameTest {
   public void joinGameTest() {
         
     // Create HTTP request for joingame and get response
-    HttpResponse<?> response = Unirest.get("http://localhost:8080/joingame").asString();
-    int restStatus = response.getStatus();
+    Unirest.get("http://localhost:8080/joingame").asString();
         
     // Check if joingame works well
     //assertEquals(restStatus, 200);

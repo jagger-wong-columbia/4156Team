@@ -63,9 +63,6 @@ public class Move {
     if (game.isGameStarted() == false) {
       // invalid if game is not yet started
       myMes.setNotStarted();
-    } else if (this.getPlayer() == null) {
-      // invalid if player is not in this game
-      myMes.setWrongPlayer();
     }  else if (game.isDraw() == true || game.getWinner() != 0) {
       // invalid if game already ended
       myMes.setEnded();

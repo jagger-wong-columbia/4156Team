@@ -64,13 +64,4 @@ public class Message {
     this.code = 403;
     this.message = "This position is filled!";
   }
-  
-  /** Initialize a invalid message when the position is filled.
-   */
-  // Send valid message;
-  public void setWrongPlayer() {
-    this.moveValidity = false;
-    this.code = 404;
-    this.message = "You are not in this game!";
-  }
 }
