@@ -2,10 +2,10 @@ package models;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.google.gson.Gson;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import com.google.gson.Gson;
 
 class GameBoardTest {
   
