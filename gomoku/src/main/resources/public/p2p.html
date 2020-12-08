@@ -769,10 +769,58 @@
   </script> -->
 
   <script language="javascript" type="text/javascript">
+    createWebSocket();
+
     var currentMove = "boardCellCross";
     var turn = 1; 
     var on = true;
-    
+
+    function createWebSocket() {
+      //Establish the WebSocket connection and set up event handler.
+      ws = new WebSocket("ws://localhost:8080/gameboard");
+      ws.onmessage = msg => retriveGameBoard(msg);
+      ws.onclose = () => alert("WebSocket connection closed");
+      console.log("createwebsocket");
+    }
+
+    function retriveGameBoard(msg) { // display message for debug
+      console.log("receive from websocket");
+      let data = JSON.parse(msg.data);
+      console.log(msg.data);
+      console.log(data.boardState);
+      console.log(data.boardState[0]);
+      for (var i = 0; i <  15; i++) {
+        for (var j = 0; j < 15; j++) {
+            if (data.boardState[i][j] === 'O') {
+              document.getElementById(i + "-" + j).className = "boardCellCircle";
+            } else if (data.boardState[i][j] === 'X') {
+              document.getElementById(i + "-" + j).className = "boardCellCross";
+            } else {
+              document.getElementById(i + "-" + j).className = "boardCell";
+            }
+        }
+      }
+
+      if (data.turn % 2 === 0) {
+        turn = 2;
+      } else {
+        turn = 1;
+      }
+      if (turn === 1) {
+        if (data.p1.type === 'O') {
+          currentMove = "boardCellCircle";
+        } else {
+          currentMove = "boardCellCross";
+        }
+      } else {
+        if (data.p2.type === 'O') {
+          currentMove = "boardCellCircle";
+        } else {
+          currentMove = "boardCellCross";
+        }
+      }
+    }
+
     function startgame(move) {
       var xhr1 = new XMLHttpRequest();
       xhr1.open("GET","http://localhost:8080/newgame",true);
@@ -835,10 +883,7 @@
         // var message = $("#message");
         // message.text("hello world");
 
-        if(currentMove == "boardCellCross") currentMove = "boardCellCircle";
-        else currentMove = "boardCellCross";
-        if(turn == 1) turn = 2;
-        else turn = 1;
+
       }
     }
 
