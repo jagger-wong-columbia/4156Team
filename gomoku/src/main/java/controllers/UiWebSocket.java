@@ -28,6 +28,7 @@ public class UiWebSocket implements Consumer<WsHandler>  {
       @Override
       public void handleConnect(final WsConnectContext ctx) throws Exception {
         // TODO Auto-generated method stub
+    	System.out.println(ctx.getSessionId() + " connected");
         SESSIONS.add(ctx.session);
       }
 
