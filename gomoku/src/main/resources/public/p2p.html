@@ -831,6 +831,13 @@
           currentMove = "boardCellCross";
         }
       }
+      
+      // update the win message at the same time in two pages;
+      if (data.winner != 0) {
+        document.getElementById("message").className = "looseState";
+        document.getElementById("message").innerHTML = "Player " + data.winner + " wins the game";
+      }
+      
     }
 
     function startgame(move) {
