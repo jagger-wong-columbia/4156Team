@@ -769,11 +769,80 @@
   </script> -->
 
   <script language="javascript" type="text/javascript">
+    createWebSocket();
+
     var currentMove = "boardCellCross";
-    var turn = 1; 
+    player = parseInt(window.location.search[3]);
+    console.log(player);
+    console.log("for test");
     var on = true;
-    
+    turn = 1;
+
+     // whether game is Started
+    if (player === 2) {
+      gameStarted = true;
+    } else {
+      gameStarted = false;
+    }
+    console.log(gameStarted);
+
+
+    function createWebSocket() {
+      //Establish the WebSocket connection and set up event handler.
+      ws = new WebSocket("ws://localhost:8080/gameboard");
+      ws.onmessage = msg => retriveGameBoard(msg);
+      ws.onclose = () => alert("WebSocket connection closed");
+      console.log("createwebsocket");
+    }
+
+    function retriveGameBoard(msg) { // display message for debug
+      console.log("receive from websocket");
+      let data = JSON.parse(msg.data);
+      console.log(msg.data);
+      console.log(data.boardState);
+      console.log(data.boardState[0]);
+      for (var i = 0; i <  15; i++) {
+        for (var j = 0; j < 15; j++) {
+            if (data.boardState[i][j] === 'O') {
+              document.getElementById(i + "-" + j).className = "boardCellCircle";
+            } else if (data.boardState[i][j] === 'X') {
+              document.getElementById(i + "-" + j).className = "boardCellCross";
+            } else {
+              document.getElementById(i + "-" + j).className = "boardCell";
+            }
+        }
+      }
+
+      if (data.turn % 2 === 0) {
+        turn = 2;
+      } else {
+        turn = 1;
+      }
+      if (turn === 1) {
+        if (data.p1.type === 'O') {
+          currentMove = "boardCellCircle";
+        } else {
+          currentMove = "boardCellCross";
+        }
+      } else {
+        if (data.p2.type === 'O') {
+          currentMove = "boardCellCircle";
+        } else {
+          currentMove = "boardCellCross";
+        }
+      }
+      
+      // update the win message at the same time in two pages;
+      if (data.winner != 0) {
+        document.getElementById("message").className = "looseState";
+        document.getElementById("message").innerHTML = "Player " + data.winner + " wins the game";
+      }
+      
+    }
+
     function startgame(move) {
+
+      gameStarted = true;
       var xhr1 = new XMLHttpRequest();
       xhr1.open("GET","http://localhost:8080/newgame",true);
       xhr1.send();
@@ -781,12 +850,14 @@
       var xhr = new XMLHttpRequest();
       xhr.open("POST","http://localhost:8080/startgame",true);
       xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-      // xhr.onload = function() {
-      //   var xhr1 = new XMLHttpRequest();
-      //   xhr1.open("GET","http://localhost:8080/joingame",true);
-      //   window.open('http://localhost:8080/p2p.html?p=2','_blank');
-      //   xhr1.send();
-      // };
+      xhr.onload = function() {
+         console.log("join game1");
+         var xhr1 = new XMLHttpRequest();
+         xhr1.open("GET","http://localhost:8080/joingame",true);
+         window.open('http://localhost:8080/p2p.html?p=2','_blank');
+        console.log("join game2");
+         xhr1.send();
+       };
       xhr.send('type=' + move);
 
       // var xhr1 = new XMLHttpRequest();
@@ -797,48 +868,55 @@
     }
 
     function move(row, col) {
-      if(on && document.getElementById(row + "-" + col).className == "boardCell") {
-        var xhr = new XMLHttpRequest();
-        var request = GetRequest();
+      console.log(player);
+      console.log(turn);
+      console.log(player === turn + " 1");
+      if (gameStarted === true) {
+        console.log(player === turn + "2");
+        if (player === turn) {
+          if (on && document.getElementById(row + "-" + col).className == "boardCell") {
+            var xhr = new XMLHttpRequest();
+            var request = GetRequest();
 
-        // xhr.open("POST","http://localhost:8080/move/" + request["p"],true);
-        xhr.open("POST","http://localhost:8080/move/",true);
-        xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        xhr.send("x=" + row + "&y=" + col + "&turn=" + turn);
-        document.getElementById(row + "-" + col).className = currentMove;
-        xhr.onreadystatechange = function() {
-          if(xhr.readyState === 4 && xhr.status === 200){
-            console.log(xhr.responseText);
-          }
-        }
-        xhr.onload = function() {
-          var xhr1 = new XMLHttpRequest();
-          xhr1.open("GET","http://localhost:8080/getgame",true);
-          xhr1.send();
-          xhr1.onreadystatechange = function() {
-            if(xhr1.readyState === 4 && xhr1.status === 200){
-              var response = xhr1.responseText;
-              // console.log(response.split(":")[11]);
-              var winner = JSON.parse(response)["winner"];
-              if(winner != "0") {
-                on = false;
-                // console.log(on);
-                document.getElementById("message").className = "looseState";
-                document.getElementById("message").innerHTML = "Player " + winner + " wins the game";
+            // xhr.open("POST","http://localhost:8080/move/" + request["p"],true);
+            xhr.open("POST", "http://localhost:8080/move/", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("x=" + row + "&y=" + col + "&turn=" + turn);
+            document.getElementById(row + "-" + col).className = currentMove;
+            xhr.onreadystatechange = function () {
+              if (xhr.readyState === 4 && xhr.status === 200) {
+                console.log(xhr.responseText);
               }
             }
+            xhr.onload = function () {
+              var xhr1 = new XMLHttpRequest();
+              xhr1.open("GET", "http://localhost:8080/getgame", true);
+              xhr1.send();
+              xhr1.onreadystatechange = function () {
+                if (xhr1.readyState === 4 && xhr1.status === 200) {
+                  var response = xhr1.responseText;
+                  // console.log(response.split(":")[11]);
+                  var winner = JSON.parse(response)["winner"];
+                  if (winner != "0") {
+                    on = false;
+                    // console.log(on);
+                    document.getElementById("message").className = "looseState";
+                    document.getElementById("message").innerHTML = "Player " + winner + " wins the game";
+                  }
+                }
+              }
+            };
+            console.log("x=" + row + "&y=" + col + "&turn=" + turn);
+            console.log("Make a move in " + row + "," + col);
+            // $("#message").text("");
+            // var message = $("#message");
+            // message.text("hello world");
           }
-        };
-        console.log("x=" + row + "&y=" + col + "&turn=" + turn);
-        console.log("Make a move in " + row + "," + col);
-        // $("#message").text("");
-        // var message = $("#message");
-        // message.text("hello world");
-
-        if(currentMove == "boardCellCross") currentMove = "boardCellCircle";
-        else currentMove = "boardCellCross";
-        if(turn == 1) turn = 2;
-        else turn = 1;
+        } else {
+          alert("It is not your turn. Please wait.");
+        }
+      } else {
+        alert("Game is not started. Please new a game.");
       }
     }
 
